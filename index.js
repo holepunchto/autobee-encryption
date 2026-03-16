@@ -4,6 +4,7 @@ const crypto = require('hypercore-crypto')
 const c = require('compact-encoding')
 const b4a = require('b4a')
 
+const { ManifestData } = require('autobase/lib/messages.js')
 const [, NS_VIEW_BLOCK_KEY, NS_HASH_KEY] = crypto.namespace('autobase', 4)
 
 const [GENESIS_ENTROPY] = crypto.namespace('autobase/entropy', 2)
@@ -157,13 +158,13 @@ class WriterEncryption extends AutobaseEncryption {
   }
 
   blockKey(entropy, ctx) {
-    // todo: do we still need this?
-    // if (ctx.manifest.userData) {
-    //   const userData = c.decode(ManifestData, ctx.manifest.userData)
-    //   if (userData.namespace !== null) {
-    //     return getBlockKey(this.auto.key, this.auto.encryptionKey, entropy, userData.namespace)
-    //   }
-    // }
+    // used for anchors
+    if (ctx.manifest.userData) {
+      const userData = c.decode(ManifestData, ctx.manifest.userData)
+      if (userData.namespace !== null) {
+        return getBlockKey(this.auto.key, this.auto.encryptionKey, entropy, userData.namespace)
+      }
+    }
 
     return getBlockKey(this.auto.key, this.auto.encryptionKey, entropy, ctx.key)
   }
