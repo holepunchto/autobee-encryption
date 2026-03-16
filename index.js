@@ -40,7 +40,7 @@ const [GENESIS_ENTROPY] = crypto.namespace('autobase/entropy', 2)
 const nonce = b4a.alloc(sodium.crypto_stream_NONCEBYTES)
 const hash = nonce.subarray(0, sodium.crypto_generichash_BYTES_MIN)
 
-class AutobaseEncryption {
+class AutobeeEncryption {
   static PADDING = 8
 
   constructor(auto) {
@@ -56,7 +56,7 @@ class AutobaseEncryption {
   }
 
   padding() {
-    return AutobaseEncryption.PADDING
+    return AutobeeEncryption.PADDING
   }
 
   isCompat() {
@@ -129,8 +129,8 @@ class AutobaseEncryption {
       return HypercoreEncryption.decrypt(index, block, this.compat.block)
     }
 
-    const padding = block.subarray(0, AutobaseEncryption.PADDING)
-    block = block.subarray(AutobaseEncryption.PADDING)
+    const padding = block.subarray(0, AutobeeEncryption.PADDING)
+    block = block.subarray(AutobeeEncryption.PADDING)
 
     const type = padding[0]
     switch (type) {
@@ -154,9 +154,18 @@ class AutobaseEncryption {
     // Decrypt the block using the full nonce
     decrypt(block, nonce, keys.block)
   }
+
+  static encryptAnchor(block, bootstrap, encryptionKey, namespace) {
+    const entropy = GENESIS_ENTROPY
+
+    const blockKey = getBlockKey(bootstrap, encryptionKey, entropy, namespace)
+    const hashKey = crypto.hash([NS_HASH_KEY, block])
+
+    encryptBlock(0, block, 0, blockKey, hashKey)
+  }
 }
 
-class ViewEncryption extends AutobaseEncryption {
+class ViewEncryption extends AutobeeEncryption {
   constructor(auto, name) {
     super(auto)
     this.name = name
@@ -176,7 +185,7 @@ class ViewEncryption extends AutobaseEncryption {
   }
 }
 
-class WriterEncryption extends AutobaseEncryption {
+class WriterEncryption extends AutobeeEncryption {
   isCompat(ctx) {
     return ctx.manifest.version <= 1
   }
@@ -190,7 +199,8 @@ class WriterEncryption extends AutobaseEncryption {
     if (ctx.manifest.userData) {
       const userData = c.decode(ManifestData, ctx.manifest.userData)
       if (userData.namespace !== null) {
-        return getBlockKey(this.auto.key, this.auto.encryptionKey, entropy, userData.namespace)
+        const b = getBlockKey(this.auto.key, this.auto.encryptionKey, entropy, userData.namespace)
+        return b
       }
     }
 
@@ -199,6 +209,7 @@ class WriterEncryption extends AutobaseEncryption {
 }
 
 module.exports = {
+  AutobeeEncryption,
   WriterEncryption,
   ViewEncryption
 }
@@ -230,8 +241,8 @@ function blockhash(block, padding, hashKey) {
 }
 
 function encryptBlock(index, block, id, blockKey, hashKey) {
-  const padding = block.subarray(0, AutobaseEncryption.PADDING)
-  block = block.subarray(AutobaseEncryption.PADDING)
+  const padding = block.subarray(0, AutobeeEncryption.PADDING)
+  block = block.subarray(AutobeeEncryption.PADDING)
 
   blockhash(block, padding, hashKey)
   c.uint32.encode({ start: 4, end: 8, buffer: padding }, id)
