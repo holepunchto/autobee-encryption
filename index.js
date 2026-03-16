@@ -4,7 +4,35 @@ const crypto = require('hypercore-crypto')
 const c = require('compact-encoding')
 const b4a = require('b4a')
 
-const { ManifestData } = require('autobase/lib/messages.js')
+const ManifestData = {
+  preencode(state, m) {
+    c.uint.preencode(state, m.version)
+    state.end++ // max flag is 2 so always one byte
+
+    if (m.legacyBlocks) c.uint.preencode(state, m.legacyBlocks)
+    if (m.namespace) c.fixed32.preencode(state, m.namespace)
+  },
+  encode(state, m) {
+    const flags = (m.legacyBlocks ? 1 : 0) | (m.namespace ? 2 : 0)
+
+    c.uint.encode(state, m.version)
+    c.uint.encode(state, flags)
+
+    if (m.legacyBlocks) c.uint.encode(state, m.legacyBlocks)
+    if (m.namespace) c.fixed32.encode(state, m.namespace)
+  },
+  decode(state) {
+    const r0 = c.uint.decode(state)
+    const flags = c.uint.decode(state)
+
+    return {
+      version: r0,
+      legacyBlocks: (flags & 1) !== 0 ? c.uint.decode(state) : 0,
+      namespace: (flags & 2) !== 0 ? c.fixed32.decode(state) : null
+    }
+  }
+}
+
 const [, NS_VIEW_BLOCK_KEY, NS_HASH_KEY] = crypto.namespace('autobase', 4)
 
 const [GENESIS_ENTROPY] = crypto.namespace('autobase/entropy', 2)
