@@ -68,7 +68,7 @@ class AutobeeEncryption {
   }
 
   async update(ctx) {
-    return
+    if (!this.keys) this.keys = await this.get(0, ctx)
   }
 
   async get(id, ctx) {
