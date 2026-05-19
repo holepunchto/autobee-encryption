@@ -178,7 +178,7 @@ class AutobeeEncryption {
       encryptionKey
     }
 
-    core.setEncryption(new ViewEncryption(info, 'system'))
+    return core.setEncryption(new ViewEncryption(info, 'system'))
   }
 }
 
