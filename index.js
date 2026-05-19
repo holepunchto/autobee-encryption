@@ -163,6 +163,23 @@ class AutobeeEncryption {
 
     encryptBlock(0, block, 0, blockKey, hashKey)
   }
+
+  static async setSystemEncryption(bootstrap, encryptionKey, core, opts) {
+    await core.ready()
+    if (core.manifest.version === 1) {
+      const key = getCompatBlockKey(bootstrap, encryptionKey, '_system')
+      core.setEncryptionKey(key, { block: true })
+      return
+    }
+
+    const info = {
+      bootstrap,
+      key: bootstrap,
+      encryptionKey
+    }
+
+    core.setEncryption(new ViewEncryption(info, 'system'))
+  }
 }
 
 class ViewEncryption extends AutobeeEncryption {
