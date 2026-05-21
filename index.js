@@ -59,8 +59,8 @@ class AutobeeEncryption {
     return AutobeeEncryption.PADDING
   }
 
-  isCompat() {
-    return false
+  isCompat(ctx) {
+    return ctx.manifest.version <= 1
   }
 
   load(keys) {
@@ -190,7 +190,7 @@ class ViewEncryption extends AutobeeEncryption {
 
   compatKeys() {
     const { bootstrap, encryptionKey } = this.auto
-    const block = getCompatBlockKey(bootstrap, encryptionKey, this.name)
+    const block = getCompatBlockKey(bootstrap.key, encryptionKey, this.name)
     return {
       block,
       blinding: crypto.hash(block)
@@ -203,10 +203,6 @@ class ViewEncryption extends AutobeeEncryption {
 }
 
 class WriterEncryption extends AutobeeEncryption {
-  isCompat(ctx) {
-    return ctx.manifest.version <= 1
-  }
-
   compatKeys(ctx) {
     return HypercoreEncryption.deriveKeys(this.auto.encryptionKey, ctx.key)
   }
