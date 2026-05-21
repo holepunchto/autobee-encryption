@@ -203,8 +203,8 @@ class ViewEncryption extends AutobeeEncryption {
 }
 
 class WriterEncryption extends AutobeeEncryption {
-  isCompat(ctx) {
-    return ctx.manifest.version <= 1
+  compatKeys(ctx) {
+    return HypercoreEncryption.deriveKeys(this.auto.encryptionKey, ctx.key)
   }
 
   blockKey(entropy, ctx) {
