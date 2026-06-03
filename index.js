@@ -173,7 +173,6 @@ class AutobeeEncryption {
     }
 
     const info = {
-      bootstrap,
       key: bootstrap,
       encryptionKey
     }
@@ -189,8 +188,7 @@ class ViewEncryption extends AutobeeEncryption {
   }
 
   compatKeys() {
-    const { bootstrap, encryptionKey } = this.auto
-    const block = getCompatBlockKey(bootstrap.key, encryptionKey, this.name)
+    const block = getCompatBlockKey(this.auto.key, this.auto.encryptionKey, this.name)
     return {
       block,
       blinding: crypto.hash(block)
