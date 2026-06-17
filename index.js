@@ -173,12 +173,24 @@ class AutobeeEncryption {
     }
 
     const info = {
-      bootstrap,
       key: bootstrap,
       encryptionKey
     }
 
     return core.setEncryption(new ViewEncryption(info, 'system'))
+  }
+
+  static getSystemEncryption(bootstrap, encryptionKey) {
+    return AutobeeEncryption.getViewEncryption(bootstrap, encryptionKey, '_system')
+  }
+
+  static getViewEncryption(bootstrap, encryptionKey, name) {
+    const info = { key: bootstrap, encryptionKey }
+    return new ViewEncryption(info, name)
+  }
+
+  static getWriterEncryption(bootstrap, encryptionKey) {
+    return new WriterEncryption({ key: bootstrap, encryptionKey })
   }
 }
 
@@ -189,8 +201,7 @@ class ViewEncryption extends AutobeeEncryption {
   }
 
   compatKeys() {
-    const { bootstrap, encryptionKey } = this.auto
-    const block = getCompatBlockKey(bootstrap.key, encryptionKey, this.name)
+    const block = getCompatBlockKey(this.auto.key, this.auto.encryptionKey, this.name)
     return {
       block,
       blinding: crypto.hash(block)
