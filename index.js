@@ -177,7 +177,7 @@ class AutobeeEncryption {
       encryptionKey
     }
 
-    return core.setEncryption(new ViewEncryption(info, 'system'))
+    return core.setEncryption(new ViewEncryption(info, '_system'))
   }
 
   static getSystemEncryption(bootstrap, encryptionKey) {
