@@ -36,7 +36,7 @@
   "homepage": "https://github.com/holepunchto/autobee-encryption",
   "dependencies": {
     "b4a": "^1.8.0",
-    "compact-encoding": "^2.19.0",
+    "compact-encoding": "^3.4.0",
     "hypercore": "^11.27.14",
     "hypercore-crypto": "^3.6.1",
     "sodium-universal": "^5.0.1"
